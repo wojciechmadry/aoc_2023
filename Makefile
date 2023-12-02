@@ -11,5 +11,5 @@ build:
 	docker build -t scala -f Dockerfile.scala .
 
 run:
-	docker run -itd --volume="${PWD}:/home/${USER}/aoe:rw" --name scala scala
+	docker run -itd --volume="${PWD}:/home/${USER}/aoc:rw" --name scala scala
 
