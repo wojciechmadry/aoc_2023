@@ -9,14 +9,12 @@ object D4T2 {
             val bothSide = line.substring(idx, line.length()).split('|')
             val leftSide = bothSide(0).split(' ').filter(_.nonEmpty)
             val rightSide = bothSide(1).split(' ').filter(_.nonEmpty)
-            var cnt = 0
+            var idxMult = i + 1
             for(myNumber <- leftSide) {
                 if (rightSide.contains(myNumber)) {
-                    cnt = cnt + 1
+                    multiplier(idxMult) = multiplier(idxMult) + multiplier(i)
+                    idxMult += 1
                 }
-            }
-            for( j <- i + 1 to i + cnt) {
-                multiplier(j) = multiplier(j) + multiplier(i)
             }
         }
         println("Sum = " + multiplier.sum)

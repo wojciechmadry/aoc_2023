@@ -7,11 +7,11 @@ object D4T1 {
         for ((line, i) <- lines.zipWithIndex) {
             val idx = line.indexOf(':') + 2
             val bothSide = line.substring(idx, line.length()).split('|')
-            val leftSide = bothSide(0).split(' ')
-            val rightSide = bothSide(1).split(' ')
+            val leftSide = bothSide(0).split(' ').filter(_.nonEmpty)
+            val rightSide = bothSide(1).split(' ').filter(_.nonEmpty)
             var cnt = 0
             for(myNumber <- leftSide) {
-                if (!myNumber.isEmpty() && rightSide.contains(myNumber)) {
+                if (rightSide.contains(myNumber)) {
                     cnt = cnt + 1
                 }
             }
