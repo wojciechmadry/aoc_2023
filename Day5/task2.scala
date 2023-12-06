@@ -2,10 +2,11 @@ import scala.io.Source
 import scala.math.BigInt
 
 object D5T2 {
+
     def map(value: BigInt,range: String) : BigInt = {
         val ranges = range.split(' ').filter(_.nonEmpty).map(BigInt(_))
-        val destRange = ranges(0)
-        val destSrc = ranges(1)
+        val destRange = ranges(1)
+        val destSrc = ranges(0)
         val rangeLength = ranges(2)
         if(value >= destSrc && value <= destSrc + rangeLength) {
             return destRange + value - destSrc
@@ -40,7 +41,7 @@ object D5T2 {
     }
 
     def main(args: Array[String]) = {
-        val lines = Source.fromFile("example.txt").getLines.toArray
+        val lines = Source.fromFile("input.txt").getLines.toArray
         // Input indexes
         val seeds_idx = 0
         val s_to_s = lines.indexOf("seed-to-soil map:")
@@ -51,43 +52,31 @@ object D5T2 {
         val t_to_h = lines.indexOf("temperature-to-humidity map:")
         val h_to_l = lines.indexOf("humidity-to-location map:")
 
-        val const = BigInt(100000)
+        type Point = (BigInt,BigInt)
+
         // Parse input
         val seedsFile = lines(seeds_idx).substring(6).split(' ').filter(_.nonEmpty).map(BigInt(_))
-        var min = BigInt("99999999999999999999")
-        for(i <- 0 until seedsFile.length by 2) {
-            var j = seedsFile(i)
-            var last = BigInt("0")
-            var changed = false
-            while(j < seedsFile(i) + seedsFile(i+1)) {
-                val s = j
-                val soil = findMap(s, s_to_s, s_to_f, lines)
-                val fer = findMap(soil, s_to_f, f_to_w, lines)
-                val water = findMap(fer, f_to_w, w_to_l, lines)
-                val light = findMap(water, w_to_l, l_to_t, lines)
-                val temp = findMap(light, l_to_t, t_to_h, lines)
-                val humi = findMap(temp, t_to_h, h_to_l, lines)
-                val loc = findMap(humi, h_to_l, lines.length, lines)
-                val loc_min = loc.min
-                if(loc_min < min) {
-                    min = loc_min
+        var i = 25000000 // Let's go bruteforce!!!
+        var found = false
+        while(found == false) {
+            val loc = findMap(i, h_to_l, lines.length, lines)
+            val humi = findMap(loc, t_to_h, h_to_l, lines)
+            val temp = findMap(humi, l_to_t, t_to_h, lines)
+            val light = findMap(temp, w_to_l, l_to_t, lines)
+            val water = findMap(light, f_to_w, w_to_l, lines)
+            val fer = findMap(water, s_to_f, f_to_w, lines)
+            val soil = findMap(fer, s_to_s, s_to_f, lines)
+            for(s <- soil) {
+                for(j <- 0 until seedsFile.length by 2) {
+                    if(s >= seedsFile(j) && s < seedsFile(j) + seedsFile(j+1)) {
+                        println("Seed = " + s)
+                        println("Location = " + i)
+                        found = true
+                    }
                 }
-                /*if(last != min && changed) {
-                    j = j - const + 1
-                    changed = false; 
-                }
-                if (last == min) {
-                    j += const
-                    changed = true
-                } else {
-                    j = j + 1
-                }*/
-                j = j + 1
-                last = min
-                
-               // println("Progress : " + j + " / " + seedsFile(i) + seedsFile(i+1))
             }
+            i += 1
+            println(i)
         }
-        println("Best location = " + min)
     }
 }
