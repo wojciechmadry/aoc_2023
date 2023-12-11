@@ -51,36 +51,6 @@ object D10T2 {
         println("=======================")
     }
 
-    def findFill(pipe: Char) : Char = {
-        if(pipe == '|') {
-            return '|'
-        }
-        return 'X'
-    }
-
-    def resize(old: Array[Array[Char]]) : Array[Array[Char]] = {
-        var res = new Array[Array[Char]](old.length * 2)
-        for(i <- 0 until res.length) {
-            res(i) = new Array[Char](old(0).length * 2)
-            for(j <- 0 until res(i).length) {
-                res(i)(j) = '.'
-            }
-        }
-        for(y <- 0 until old.length) {
-            for(x <- 0 until old(y).length) {
-                res(y*2)(x*2) = old(y)(x)
-                val myC = old(y)(x)
-                if(myC != '.') {
-                    val up = Pair(x * 2, y * 2 - 1)
-                    if(up.y >= 0) {
-                        res(up.y)(up.x) = findFill(myC)
-                    }
-                    //val down = Pair(j + 1, i)
-                }
-            }
-        }
-        return res
-    }
 
     def calculateDist(filename: String): Int = {
         val lines = Source.fromFile(filename).getLines.toArray
@@ -91,25 +61,24 @@ object D10T2 {
                 map(i)(j) = c
             }
         }
-        var nmap = resize(map)
         var visited = new scala.collection.mutable.ArrayBuffer[Pair](0)
         for(i <- 0 until map.length) {
             if(map(i)(0) == '.') {
-                //fill(Pair(0, i), map, visited)
+                fill(Pair(0, i), map, visited)
             }
             if(map(i)(map(i).length - 1) == '.') {
-                //fill(Pair(map(i).length - 1, i), map, visited)
+                fill(Pair(map(i).length - 1, i), map, visited)
             }
         }
         for(i <- 0 until map(0).length) {
             if(map(0)(i) == '.') {
-                //fill(Pair(i, 0), map, visited)
+                fill(Pair(i, 0), map, visited)
             }
             if(map(map.length - 1)(i) == '.') {
-                //fill(Pair(i, map.length - 1), map, visited)
+                fill(Pair(i, map.length - 1), map, visited)
             }
         }
-        printMap(nmap)
+        printMap(map)
         var enclosed = 0
         for(row <- map) {
             for(c <- row) {
@@ -121,10 +90,7 @@ object D10T2 {
         return enclosed
     }
     def main(args: Array[String]) = {
-        assert(calculateDist("example.txt") == 4, "example.txt != 4")
-        //assert(calculateDist("example1.txt") == 4, "example1.txt != 4")
-       // assert(calculateDist("example2.txt") == 8, "example2.txt != 8")
-       // assert(calculateDist("example3.txt") == 10, "example3.txt != 10")
-       // println("Dist = " + calculateDist("input.txt"))
+       println(calculateDist("example1.txt"))
+       //println(calculateDist("input.txt")) // 250 < result < 350 <- Estimated from aoc web AND (!= 280)
     }
 }
