@@ -21,17 +21,33 @@ object D12T2 {
         result
     }
 
-    def compare(lhs : Array[Byte], rhs : Array[Int]) : Boolean = {
-        cnt(lhs).sameElements(rhs)
+    def compare(lhs : Array[Byte], org : Array[Int], partial : Boolean, idx : Int) : Boolean = {
+        var lhs_cnt = cnt(lhs.slice(0, idx))
+        if (partial == false) {
+            return lhs_cnt.sameElements(org)
+        }
+        if(lhs_cnt.size > org.size) {
+            return false
+        }
+        var areSame = true
+        for(i <- 0 until lhs_cnt.size - 1) {
+            if(lhs_cnt(i) != org(i)) {
+                areSame = false
+            }
+        }
+        return areSame
     }
 
     def genComb(map : Array[Byte], idx : Int, org: Array[Int]) : Int = {
         var combs = 0
         if(idx == map.length) {
-            if(compare(map, org)) {
+            if(compare(map, org, false, idx)) {
                 combs = combs + 1
             }
             return combs
+        }
+        if(!compare(map, org, true, idx)) {
+            return 0
         }
         if(map(idx) == '?'){
             map(idx) = '.'
@@ -40,14 +56,19 @@ object D12T2 {
             combs = combs + genComb(map, idx + 1, org)
             map(idx) = '?'
         } else {
-            combs = combs + genComb(map, idx + 1, org)
+            var nextIdx = idx + 1
+            while(nextIdx < map.length && map(nextIdx) != '?') {
+                nextIdx = nextIdx + 1
+            }
+            combs = combs + genComb(map, nextIdx, org)
         }
         return combs
     }
 
     def main(args: Array[String]) = {
-        val lines = Source.fromFile("example.txt").getLines.toArray
-        var sum = 0
+        val lines = Source.fromFile("input.txt").getLines.toArray
+        var sum = BigInt(0)
+        val before = System.currentTimeMillis
         for((l, progress) <- lines.zipWithIndex) {
             val spl = l.split(' ')
             val ar = spl(0)
@@ -66,15 +87,17 @@ object D12T2 {
                     byteArray :+= '?'
                 }
             }
-            println(new String(byteArray))
-            for(v <- values) {
-                print(v + " ")
-            }
-            println("")
+            //println(new String(byteArray))
+            //for(v <- values) {
+            //    print(v + " ")
+            // }
+            //println("")
             val comb = genComb(byteArray, ar.indexOf('?'), values)
-            sum = sum + comb
+            sum = sum + BigInt(comb)
             println("Progress : " + (progress + 1) + " / " + lines.length)
         }
+        val after = System.currentTimeMillis
+        println("Elapsed = " + (after-before) + " ms")
         println("Sum = " + sum)
     }
 }
