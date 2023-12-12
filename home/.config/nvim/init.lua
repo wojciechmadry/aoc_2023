@@ -375,6 +375,14 @@ vim.bo.softtabstop = 2
 
 -- [[ Basic Keymaps ]]
 
+-- Run scala program
+vim.keymap.set('n', '<Leader>rr',
+  function()
+  local fname = vim.fn.input('Path to scala file: ', './' , 'file')
+  vim.cmd('botright :split | resize 10 | terminal scala ' .. fname)
+  end
+  , { silent = true })
+
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
